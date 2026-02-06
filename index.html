@@ -21,6 +21,7 @@
         #image-modal, #draw-modal, #custom-modal, #history-modal { transition: opacity 0.2s ease; }
         .modal-hidden { opacity: 0; pointer-events: none; display: none !important; }
         
+        /* フローティングアクションボタン (+) */
         #fab-add {
             position: fixed;
             bottom: 2.5rem;
@@ -28,13 +29,14 @@
             z-index: 40;
             display: flex;
             align-items: center;
-            gap: 0.5rem;
-            padding: 1rem 1.5rem;
+            justify-content: center;
+            width: 3.8rem;
+            height: 3.8rem;
             border-radius: 9999px;
-            box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.4);
-            transition: transform 0.2s;
+            box-shadow: 0 10px 20px -5px rgba(37, 99, 235, 0.5);
+            transition: transform 0.2s, background-color 0.2s;
         }
-        #fab-add:active { transform: scale(0.95); }
+        #fab-add:active { transform: scale(0.9); }
 
         canvas { touch-action: none; }
         .diff-added { background-color: #dcfce7; color: #166534; padding: 2px 4px; border-radius: 4px; }
@@ -44,8 +46,10 @@
 <body class="bg-gray-50 text-gray-900">
 
 <div id="app" class="max-w-full md:max-w-md mx-auto min-h-screen pb-32 relative">
-    <header class="bg-white border-b sticky top-0 z-20 p-4 flex justify-between items-center">
-        <h1 class="text-xl font-bold text-blue-600">荷物管理</h1>
+    <header class="bg-white border-b sticky top-0 z-20 p-4 flex justify-between items-center text-center">
+        <div class="w-full">
+            <h1 class="text-xl font-bold text-blue-600">荷物管理</h1>
+        </div>
     </header>
 
     <div id="tab-nav" class="bg-white border-b sticky top-[61px] z-10 flex text-sm text-gray-500">
@@ -57,7 +61,7 @@
         <!-- 一覧画面 -->
         <div id="view-list" class="space-y-4">
             <div id="user-list-container" class="space-y-3">
-                <p class="text-center text-gray-400 py-10 text-sm">読み込み中...</p>
+                <p class="text-center text-gray-400 py-10 text-sm italic">データを読み込んでいます...</p>
             </div>
         </div>
 
@@ -82,7 +86,7 @@
                         <p class="text-[10px] text-gray-400 mb-2">※写真と名前の入力が必須です</p>
                         <input type="file" id="input-luggage" accept="image/*" multiple class="hidden">
                         <button onclick="document.getElementById('input-luggage').click()" class="w-full border-2 border-dashed border-gray-300 rounded-xl p-6 flex flex-col items-center gap-2 hover:bg-gray-50 transition text-center">
-                            <i data-lucide="camera" class="text-gray-400 mx-auto w-8 h-8"></i>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-gray-400"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path><circle cx="12" cy="13" r="4"></circle></svg>
                             <span class="text-xs text-gray-500 font-medium">写真を撮影・選択</span>
                         </button>
                         <div id="luggage-previews" class="mt-4 grid grid-cols-2 gap-3"></div>
@@ -108,10 +112,9 @@
         </div>
     </main>
 
-    <!-- フローティング登録ボタン -->
-    <button id="fab-add" class="bg-blue-600 text-white font-bold">
-        <i data-lucide="plus" class="w-5 h-5"></i>
-        <span>新規登録</span>
+    <!-- フローティング登録ボタン (+) -->
+    <button id="fab-add" class="bg-blue-600 text-white shadow-xl">
+        <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
     </button>
 
     <!-- 画像プレビューモーダル -->
@@ -133,7 +136,7 @@
             <span class="font-bold">写真に書き込み</span>
             <button onclick="saveDrawing()" class="bg-blue-600 px-4 py-2 rounded-lg font-bold text-sm">保存</button>
         </div>
-        <div class="relative flex-1 w-full flex items-center justify-center overflow-hidden bg-black">
+        <div class="relative flex-1 w-full flex items-center justify-center overflow-hidden bg-black text-center">
             <canvas id="draw-canvas"></canvas>
         </div>
         <div class="w-full p-6 flex justify-around items-center bg-gray-900 border-t border-gray-800">
@@ -151,12 +154,12 @@
 
     <!-- 履歴詳細モーダル -->
     <div id="history-modal" class="modal-hidden fixed inset-0 z-[60] bg-black/70 flex items-center justify-center p-4">
-        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden flex flex-col max-h-[80vh] shadow-2xl">
-            <div class="p-4 bg-gray-100 border-b flex justify-between items-center">
+        <div class="bg-white w-full max-w-md rounded-3xl overflow-hidden flex flex-col max-h-[80vh] shadow-2xl text-center">
+            <div class="p-4 bg-gray-100 border-b flex justify-between items-center px-6">
                 <h3 class="font-bold text-gray-800">編集内容の詳細</h3>
-                <button onclick="closeHistoryModal()" class="text-gray-500"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeHistoryModal()" class="text-gray-500 p-2"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <div id="history-detail-content" class="p-6 overflow-y-auto space-y-4"></div>
+            <div id="history-detail-content" class="p-6 overflow-y-auto space-y-4 text-left"></div>
             <div class="p-4 border-t bg-gray-50">
                 <button onclick="closeHistoryModal()" class="w-full bg-blue-600 text-white py-3 rounded-xl font-bold transition active:scale-95">閉じる</button>
             </div>
@@ -182,7 +185,7 @@
 </div>
 
 <script>
-    const DB_KEY = "luggage_check_v5_gh"; 
+    const DB_KEY = "luggage_check_v5_gh_final"; 
     let users = [];
     let currentLuggageFiles = [];
     let currentTab = 'in';
@@ -201,14 +204,12 @@
     };
     const fabAdd = document.getElementById('fab-add');
 
-    // Safe Library Initializer
     function refreshIcons() {
         if (typeof lucide !== 'undefined' && lucide.createIcons) {
             lucide.createIcons();
         }
     }
 
-    // Custom Modal System
     function showCustomModal({ title, message, icon, confirmText = 'はい', confirmColor = 'bg-blue-600', onConfirm }) {
         const modal = document.getElementById('custom-modal');
         const titleEl = document.getElementById('modal-title');
@@ -221,9 +222,7 @@
         msgEl.innerText = message;
         confirmBtn.innerText = confirmText;
         confirmBtn.className = `flex-1 ${confirmColor} text-white py-3 rounded-xl font-bold text-sm transition active:scale-95`;
-        
         iconContainer.innerHTML = icon ? `<div class="p-3 bg-gray-50 rounded-full">${icon}</div>` : '';
-        
         modal.classList.remove('modal-hidden');
         refreshIcons();
 
@@ -244,9 +243,7 @@
 
     async function init() {
         try {
-            if (typeof localforage === 'undefined') {
-                throw new Error("LocalForage not loaded");
-            }
+            if (typeof localforage === 'undefined') throw new Error("LocalForage not loaded");
             const data = await localforage.getItem(DB_KEY);
             users = Array.isArray(data) ? data : [];
             cleanOldData();
@@ -255,7 +252,7 @@
             refreshIcons();
         } catch (err) {
             console.error("Init Error:", err);
-            document.getElementById('user-list-container').innerHTML = `<p class="text-center text-red-500 py-10 text-xs">読み込みに失敗しました。再読み込みをお試しください。</p>`;
+            document.getElementById('user-list-container').innerHTML = `<p class="text-center text-red-500 py-10 text-xs">読み込みに失敗しました。</p>`;
         }
     }
 
@@ -273,10 +270,7 @@
     }
 
     async function saveToDB() {
-        try {
-            await localforage.setItem(DB_KEY, users);
-            renderUserList();
-        } catch (err) { console.error("Save Error:", err); }
+        try { await localforage.setItem(DB_KEY, users); renderUserList(); } catch (err) { console.error("Save Error:", err); }
     }
 
     function switchTab(tab) {
@@ -297,8 +291,7 @@
     }
 
     fabAdd.onclick = () => {
-        editingUserId = null;
-        resetForm();
+        editingUserId = null; resetForm();
         document.getElementById('form-title').innerText = "新規登録";
         document.getElementById('staff-label').innerText = "受付担当者名";
         document.getElementById('delete-user-btn').classList.add('hidden');
@@ -308,7 +301,6 @@
 
     document.getElementById('cancel-reg').onclick = () => showView('list');
 
-    // Drawing
     function initDrawingCanvas() {
         const canvas = document.getElementById('draw-canvas');
         if (!canvas) return;
@@ -319,11 +311,7 @@
             ctx.beginPath(); ctx.moveTo(pos.x, pos.y);
             ctx.strokeStyle = penColor; ctx.lineWidth = 4; ctx.lineCap = 'round';
         };
-        const draw = (e) => {
-            if (!isDrawing) return;
-            const pos = getMousePos(canvas, e);
-            ctx.lineTo(pos.x, pos.y); ctx.stroke();
-        };
+        const draw = (e) => { if (!isDrawing) return; const pos = getMousePos(canvas, e); ctx.lineTo(pos.x, pos.y); ctx.stroke(); };
         const endDraw = () => { isDrawing = false; };
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
@@ -335,10 +323,7 @@
 
     function getMousePos(canvas, e) {
         const rect = canvas.getBoundingClientRect();
-        return {
-            x: (e.clientX - rect.left) * (canvas.width / rect.width),
-            y: (e.clientY - rect.top) * (canvas.height / rect.height)
-        };
+        return { x: (e.clientX - rect.left) * (canvas.width / rect.width), y: (e.clientY - rect.top) * (canvas.height / rect.height) };
     }
 
     window.openDrawModal = (idx) => {
@@ -362,11 +347,7 @@
     window.setPenColor = (color) => { penColor = color; };
     window.confirmClearCanvas = () => {
         showCustomModal({
-            title: '書き込みを消去',
-            message: 'すべて消去しますか？',
-            icon: '<i data-lucide="rotate-ccw" class="text-red-500 w-8 h-8"></i>',
-            confirmText: '消去する',
-            confirmColor: 'bg-red-500',
+            title: '書き込みを消去', message: 'すべて消去しますか？', icon: '<i data-lucide="rotate-ccw" class="text-red-500 w-8 h-8"></i>', confirmText: '消去する', confirmColor: 'bg-red-500',
             onConfirm: () => {
                 const canvas = document.getElementById('draw-canvas');
                 const img = new Image();
@@ -388,8 +369,7 @@
         const img = document.getElementById('modal-img');
         const cap = document.getElementById('modal-caption');
         img.src = src; cap.innerText = caption || "写真";
-        modal.classList.remove('modal-hidden');
-        refreshIcons();
+        modal.classList.remove('modal-hidden'); refreshIcons();
     };
     window.closeImagePreview = () => document.getElementById('image-modal').classList.add('modal-hidden');
 
@@ -408,15 +388,14 @@
     function renderLuggagePreviews() {
         const container = document.getElementById('luggage-previews');
         container.innerHTML = currentLuggageFiles.map((item, idx) => `
-            <div class="bg-white border rounded-xl p-2 space-y-2 relative shadow-sm">
-                <!-- 削除ボタン（右上）：赤丸に白いゴミ箱アイコン -->
-                <button onclick="confirmRemoveLuggage(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 shadow-lg z-10 transition active:scale-90 flex items-center justify-center border-2 border-white w-8 h-8">
-                    <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
+            <div class="bg-white border rounded-xl p-2 space-y-2 relative shadow-sm text-center">
+                <button onclick="confirmRemoveLuggage(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 shadow-lg z-10 transition active:scale-90 flex items-center justify-center border-2 border-white w-9 h-9">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>
                 </button>
-                <div class="relative group">
-                    <img src="${item.image}" onclick="openImagePreview('${item.image}', '${item.name}')" class="w-full h-24 object-cover rounded-lg cursor-zoom-in border border-gray-100">
-                    <button onclick="openDrawModal(${idx})" class="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-xl shadow-lg border border-white transition active:scale-90 flex items-center gap-1">
-                        <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-white"></i>
+                <div class="relative inline-block w-full">
+                    <img src="${item.image}" onclick="openImagePreview('${item.image}', '${item.name}')" class="w-full h-24 object-cover rounded-lg border border-gray-100">
+                    <button onclick="openDrawModal(${idx})" class="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-xl shadow-lg border border-white flex items-center gap-1">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="text-white"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"></path></svg>
                         <span class="text-[8px] text-white font-bold">編集</span>
                     </button>
                 </div>
@@ -427,118 +406,75 @@
     }
 
     window.confirmRemoveLuggage = (idx) => {
-        const luggageName = currentLuggageFiles[idx].name || 'この荷物';
-        showCustomModal({
-            title: '写真を削除',
-            message: `${luggageName} を削除しますか？`,
-            icon: '<i data-lucide="trash-2" class="text-red-500 w-8 h-8"></i>',
-            confirmText: '削除する',
-            confirmColor: 'bg-red-500',
-            onConfirm: () => {
-                currentLuggageFiles.splice(idx, 1);
-                renderLuggagePreviews();
-            }
-        });
+        const name = currentLuggageFiles[idx].name || 'この荷物';
+        showCustomModal({ title: '写真を削除', message: `${name} を削除しますか？`, icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>', confirmText: '削除する', confirmColor: 'bg-red-500', onConfirm: () => { currentLuggageFiles.splice(idx, 1); renderLuggagePreviews(); } });
     };
 
     window.updateTempLuggage = (idx, val) => { currentLuggageFiles[idx].name = val; };
 
     function resetForm() {
-        document.getElementById('reg-name').value = '';
-        document.getElementById('reg-staff').value = '';
-        document.getElementById('reg-date').value = '';
-        currentLuggageFiles = [];
-        document.getElementById('luggage-previews').innerHTML = '';
-        refreshIcons();
+        document.getElementById('reg-name').value = ''; document.getElementById('reg-staff').value = '';
+        document.getElementById('reg-date').value = ''; currentLuggageFiles = [];
+        document.getElementById('luggage-previews').innerHTML = ''; refreshIcons();
     }
 
     document.getElementById('save-user').onclick = async () => {
         const name = document.getElementById('reg-name').value.trim();
         const staff = document.getElementById('reg-staff').value.trim();
         const dateVal = document.getElementById('reg-date').value;
-        let errors = [];
-        if (!name) errors.push("利用者氏名");
-        if (!dateVal) errors.push("入居日");
-        if (currentLuggageFiles.length === 0) errors.push("荷物の登録");
-        if (currentLuggageFiles.some(l => !l.name.trim())) errors.push("すべての荷物名");
-        if (!staff) errors.push(editingUserId ? "編集者名" : "担当者名");
+        let errs = [];
+        if (!name) errs.push("利用者氏名"); if (!dateVal) errs.push("入居日");
+        if (currentLuggageFiles.length === 0) errs.push("荷物の登録");
+        if (currentLuggageFiles.some(l => !l.name.trim())) errs.push("すべての荷物名");
+        if (!staff) errs.push(editingUserId ? "編集者名" : "担当者名");
 
-        if (errors.length > 0) {
-            showCustomModal({ title: '入力不足', message: `以下を入力してください：\n・${errors.join('\n・')}`, icon: '<i data-lucide="alert-circle" class="text-orange-500 w-8 h-8"></i>', confirmText: '確認', onConfirm: () => {} });
-            return;
-        }
+        if (errs.length > 0) { showCustomModal({ title: '入力不足', message: `以下を入力してください：\n・${errs.join('\n・')}`, icon: '<i data-lucide="alert-circle" class="text-orange-500 w-8 h-8"></i>', confirmText: '確認', onConfirm: () => {} }); return; }
 
-        const timestamp = new Date(dateVal).getTime();
-        const now = Date.now();
-
+        const ts = new Date(dateVal).getTime(); const now = Date.now();
         if (editingUserId) {
             const idx = users.findIndex(u => u.id === editingUserId);
             if (idx > -1) {
-                const old = users[idx];
-                let changes = []; let diff = [];
+                const old = users[idx]; let changes = []; let diff = [];
                 if (old.name !== name) { changes.push("氏名の変更"); diff.push({label: "氏名", old: old.name, new: name}); }
-                if (old.checkinDate !== timestamp) { changes.push("入居日の修正"); diff.push({label: "入居日", old: new Date(old.checkinDate).toLocaleDateString(), new: new Date(timestamp).toLocaleDateString()}); }
-                
-                const oldIds = new Set(old.luggage.map(l => l.id));
-                const curIds = new Set(currentLuggageFiles.map(l => l.id));
-                const add = currentLuggageFiles.filter(l => !oldIds.has(l.id));
-                const rem = old.luggage.filter(l => !curIds.has(l.id));
-                
+                if (old.checkinDate !== ts) { changes.push("入居日の修正"); diff.push({label: "入居日", old: new Date(old.checkinDate).toLocaleDateString(), new: new Date(ts).toLocaleDateString()}); }
+                const oldIds = new Set(old.luggage.map(l => l.id)); const curIds = new Set(currentLuggageFiles.map(l => l.id));
+                const add = currentLuggageFiles.filter(l => !oldIds.has(l.id)); const rem = old.luggage.filter(l => !curIds.has(l.id));
                 if (add.length > 0) { changes.push("荷物の追加"); diff.push({label: "追加荷物", old: "-", new: add.map(i => i.name || "未命名").join('、')}); }
                 if (rem.length > 0) { changes.push("荷物の削除"); diff.push({label: "削除荷物", old: rem.map(i => i.name || "未命名").join('、'), new: "-"}); }
-
-                currentLuggageFiles.filter(l => oldIds.has(l.id)).forEach(ni => {
-                    const oi = old.luggage.find(x => x.id === ni.id);
-                    if (oi && oi.name !== ni.name) { diff.push({label: "荷物名修正", old: oi.name, new: ni.name}); if(!changes.includes("名前修正")) changes.push("名前修正"); }
-                });
-
-                users[idx].name = name; users[idx].checkinDate = timestamp; users[idx].luggage = JSON.parse(JSON.stringify(currentLuggageFiles));
+                currentLuggageFiles.filter(l => oldIds.has(l.id)).forEach(ni => { const oi = old.luggage.find(x => x.id === ni.id); if (oi && oi.name !== ni.name) { diff.push({label: "荷物名修正", old: oi.name, new: ni.name}); if(!changes.includes("名前修正")) changes.push("名前修正"); } });
+                users[idx].name = name; users[idx].checkinDate = ts; users[idx].luggage = JSON.parse(JSON.stringify(currentLuggageFiles));
                 users[idx].lastEditStaff = staff; users[idx].lastEditDate = now;
-                if (!users[idx].history) users[idx].history = [];
-                users[idx].history.push({ date: now, staff, action: changes.length > 0 ? changes.join(' / ') : "更新", diff });
+                if (!users[idx].history) users[idx].history = []; users[idx].history.push({ date: now, staff, action: changes.length > 0 ? changes.join(' / ') : "更新", diff });
             }
         } else {
-            users.unshift({ id: now, name, staff, luggage: JSON.parse(JSON.stringify(currentLuggageFiles)), status: 'in', checkinDate: timestamp, lastEditStaff: null, lastEditDate: null, checkoutDate: null, checkoutStaff: '', history: [{ date: now, staff, action: "新規登録", diff: [] }] });
+            users.unshift({ id: now, name, staff, luggage: JSON.parse(JSON.stringify(currentLuggageFiles)), status: 'in', checkinDate: ts, lastEditStaff: null, lastEditDate: null, checkoutDate: null, checkoutStaff: '', history: [{ date: now, staff, action: "新規登録", diff: [] }] });
         }
-        await saveToDB();
-        showView('list');
+        await saveToDB(); showView('list');
     };
 
     function renderUserList() {
         const container = document.getElementById('user-list-container');
         const filtered = users.filter(u => u.status === currentTab);
-        if (filtered.length === 0) {
-            container.innerHTML = `<div class="text-center py-24 text-gray-300 text-sm">データがありません</div>`;
-            return;
-        }
+        if (filtered.length === 0) { container.innerHTML = `<div class="text-center py-24 text-gray-300 text-sm">データがありません</div>`; return; }
         container.innerHTML = filtered.map(user => `
-            <div onclick="viewUserDetails(${user.id})" class="bg-white p-4 rounded-2xl ios-shadow flex items-center gap-4 active:scale-95 transition cursor-pointer border border-gray-100">
+            <div onclick="viewUserDetails(${user.id})" class="bg-white p-4 rounded-2xl ios-shadow flex items-center gap-4 active:scale-95 transition cursor-pointer border border-gray-100 text-left">
                 <div class="w-12 h-12 bg-blue-50 text-blue-500 rounded-full flex items-center justify-center shrink-0"><i data-lucide="user"></i></div>
                 <div class="flex-1 min-w-0">
                     <h3 class="font-bold text-lg truncate text-gray-800 leading-tight">${user.name}</h3>
                     <p class="text-[10px] text-gray-400 mt-1">入居日: ${new Date(user.checkinDate).toLocaleDateString()}</p>
                 </div>
-                ${user.status === 'in' ? `
-                <button onclick="event.stopPropagation(); editUser(${user.id})" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-xs font-bold transition active:scale-90 border border-blue-100">
-                    <i data-lucide="edit-3" class="w-4 h-4"></i><span>編集</span>
-                </button>` : `<div class="text-gray-300"><i data-lucide="chevron-right"></i></div>`}
-            </div>
-        `).join('');
+                ${user.status === 'in' ? `<button onclick="event.stopPropagation(); editUser(${user.id})" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-3 py-2 rounded-lg text-xs font-bold transition active:scale-90 border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg><span>編集</span></button>` : `<div class="text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg></div>`}
+            </div>`).join('');
         refreshIcons();
     }
 
     window.editUser = (userId) => {
         const user = users.find(u => u.id === userId);
         if (!user || user.status !== 'in') return;
-        editingUserId = userId;
-        document.getElementById('form-title').innerText = "情報の修正";
-        document.getElementById('reg-name').value = user.name;
-        document.getElementById('reg-date').value = formatDateForInput(user.checkinDate);
-        document.getElementById('reg-staff').value = ""; 
-        currentLuggageFiles = JSON.parse(JSON.stringify(user.luggage));
-        renderLuggagePreviews();
-        document.getElementById('delete-user-btn').classList.remove('hidden');
-        showView('form');
+        editingUserId = userId; document.getElementById('form-title').innerText = "情報の修正";
+        document.getElementById('reg-name').value = user.name; document.getElementById('reg-date').value = formatDateForInput(user.checkinDate);
+        document.getElementById('reg-staff').value = ""; currentLuggageFiles = JSON.parse(JSON.stringify(user.luggage));
+        renderLuggagePreviews(); document.getElementById('delete-user-btn').classList.remove('hidden'); showView('form');
     };
 
     document.getElementById('delete-user-btn').onclick = () => {
@@ -546,131 +482,93 @@
     };
 
     window.viewUserDetails = (userId) => {
-        const user = users.find(u => u.id === userId);
-        if (!user) return;
+        const user = users.find(u => u.id === userId); if (!user) return;
         const container = document.getElementById('detail-container');
         const logs = user.history ? user.history.slice().reverse() : [];
-        const historyHtml = `
-            <div class="space-y-3">
-                <p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">履歴（タップで詳細確認）</p>
-                <div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 max-h-48 overflow-y-auto space-y-4 shadow-inner">
-                    ${logs.length > 0 ? logs.map((h, i) => `
-                        <div onclick="openHistoryDetail(${user.id}, ${user.history.length - 1 - i})" class="flex gap-3 relative cursor-pointer active:opacity-60 transition pb-4 last:pb-0">
-                            <div class="w-[24px] h-[24px] bg-white border-2 border-blue-500 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm"><div class="w-2 h-2 bg-blue-500 rounded-full"></div></div>
-                            <div class="flex-1 min-w-0">
-                                <div class="flex justify-between items-start mb-1">
-                                    <span class="text-[9px] font-black text-gray-400 leading-none uppercase">${new Date(h.date).toLocaleDateString()} ${new Date(h.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>
-                                    <span class="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">${h.staff}</span>
-                                </div>
-                                <p class="text-[11px] text-gray-700 font-medium truncate">${h.action}</p>
-                            </div>
-                        </div>
-                    `).join('') : '<p class="text-center text-gray-400 text-xs py-4 italic">履歴なし</p>'}
-                </div>
-            </div>
-        `;
+        const historyHtml = `<div class="space-y-3 text-left"><p class="text-[10px] font-bold text-gray-400 uppercase tracking-widest px-1">履歴（タップで詳細確認）</p><div class="bg-gray-50 rounded-2xl p-4 border border-gray-100 max-h-48 overflow-y-auto space-y-4 shadow-inner">
+            ${logs.length > 0 ? logs.map((h, i) => `<div onclick="openHistoryDetail(${user.id}, ${user.history.length - 1 - i})" class="flex gap-3 relative cursor-pointer active:opacity-60 transition pb-4 last:pb-0 text-left"><div class="w-[24px] h-[24px] bg-white border-2 border-blue-500 rounded-full flex items-center justify-center shrink-0 z-10 shadow-sm"><div class="w-2 h-2 bg-blue-500 rounded-full"></div></div><div class="flex-1 min-w-0"><div class="flex justify-between items-start mb-1"><span class="text-[9px] font-black text-gray-400 leading-none uppercase">${new Date(h.date).toLocaleDateString()}</span><span class="text-[9px] bg-blue-100 text-blue-600 px-2 py-0.5 rounded-full font-bold">${h.staff}</span></div><p class="text-[11px] text-gray-700 font-medium truncate">${h.action}</p></div></div>`).join('') : '<p class="text-center text-gray-400 text-xs py-4 italic text-left">履歴なし</p>'}</div></div>`;
 
         container.innerHTML = `
-            <div class="bg-white p-6 rounded-3xl ios-shadow space-y-6 border border-gray-100 min-h-[85vh]">
-                <div class="flex items-center gap-4 border-b pb-4">
+            <div class="bg-white p-6 rounded-3xl ios-shadow space-y-6 border border-gray-100 min-h-[85vh] text-center">
+                <div class="flex items-center gap-4 border-b pb-4 text-left">
                     <div class="w-14 h-14 bg-blue-100 text-blue-600 rounded-2xl flex items-center justify-center shrink-0"><i data-lucide="user" class="w-8 h-8"></i></div>
-                    <div class="flex-1 min-w-0">
+                    <div class="flex-1 min-w-0 text-left">
                         <h2 class="text-xl font-black text-gray-800 truncate leading-tight">${user.name}</h2>
                         <p class="text-xs text-blue-500 font-bold mt-1">入居日: ${new Date(user.checkinDate).toLocaleDateString()}</p>
                     </div>
-                    ${user.status === 'in' ? `<button onclick="editUser(${user.id})" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-90 border border-blue-100"><i data-lucide="edit-3" class="w-4 h-4"></i><span>修正</span></button>` : ''}
+                    ${user.status === 'in' ? `<button onclick="editUser(${user.id})" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-90 border border-blue-100"><svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg><span>修正</span></button>` : ''}
                 </div>
                 ${historyHtml}
-                <div class="space-y-4">
-                    <h3 class="font-bold text-base flex items-center gap-2 text-gray-700"><i data-lucide="package" class="w-5 h-5 text-blue-500"></i>荷物確認 (${user.luggage.length})</h3>
+                <div class="space-y-4 text-left">
+                    <h3 class="font-bold text-base flex items-center gap-2 text-gray-700 text-left"><i data-lucide="package" class="w-5 h-5 text-blue-500"></i>荷物確認 (${user.luggage.length})</h3>
                     <div class="grid grid-cols-1 gap-3">
                         ${user.luggage.map((item, idx) => `
-                            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm transition active:bg-gray-100">
+                            <div class="flex items-center gap-4 p-4 bg-gray-50 rounded-2xl border border-gray-100 shadow-sm transition active:bg-gray-100 text-left">
                                 <img src="${item.image}" onclick="openImagePreview('${item.image}', '${item.name}')" class="w-14 h-14 object-cover rounded-xl shrink-0 shadow-sm cursor-zoom-in border border-white">
-                                <div class="flex-1 min-w-0"><p class="font-bold text-sm text-gray-800 truncate">${item.name || '名称未設定'}</p></div>
-                                ${user.status === 'in' ? `<input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${user.id}, ${idx})" class="w-8 h-8 rounded-full border-gray-300 accent-blue-600 cursor-pointer">` : `<div class="text-green-500"><i data-lucide="check-circle" class="w-6 h-6"></i></div>`}
+                                <div class="flex-1 min-w-0 text-left text-sm font-bold text-gray-800 truncate">${item.name || '名称未設定'}</div>
+                                ${user.status === 'in' ? `
+                                    <input type="checkbox" ${item.checked ? 'checked' : ''} onchange="toggleCheck(${user.id}, ${idx})" class="w-8 h-8 rounded-full border-gray-300 accent-blue-600 cursor-pointer">
+                                ` : `
+                                    ${item.checked ? `
+                                        <div class="text-green-500"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg></div>
+                                    ` : `
+                                        <div class="text-gray-300"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-30"><circle cx="12" cy="12" r="10"></circle></svg></div>
+                                    `}
+                                `}
                             </div>`).join('')}
                     </div>
                 </div>
                 ${user.status === 'in' ? `
                     <div class="border-t pt-6 space-y-4">
-                        <input type="text" id="checkout-staff" class="w-full border-0 bg-gray-50 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-green-500" placeholder="退居確認スタッフ名を入力">
+                        <input type="text" id="checkout-staff" class="w-full border-0 bg-gray-50 rounded-xl p-4 text-sm outline-none focus:ring-2 focus:ring-green-500 text-center" placeholder="退居確認スタッフ名を入力">
                         <button onclick="processCheckout(${user.id})" class="w-full bg-green-500 text-white py-4 rounded-2xl font-bold text-base shadow-lg active:scale-95 transition">退居処理を完了する</button>
                     </div>` : `
                     <div class="space-y-4">
-                        <div class="bg-blue-600 p-5 rounded-2xl text-white shadow-md">
+                        <div class="bg-blue-600 p-5 rounded-2xl text-white shadow-md text-left">
                             <p class="text-[10px] font-bold uppercase opacity-80 mb-1">退居済み</p>
                             <div class="flex justify-between items-end">
-                                <div><p class="text-xs font-bold">${user.checkoutStaff}</p><p class="text-[10px] opacity-70">${new Date(user.checkoutDate).toLocaleString()}</p></div>
-                                <i data-lucide="check-circle" class="w-8 h-8 opacity-40"></i>
+                                <div class="text-left"><p class="text-xs font-bold">${user.checkoutStaff}</p><p class="text-[10px] opacity-70">${new Date(user.checkoutDate).toLocaleString()}</p></div>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="opacity-40"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path><polyline points="22 4 12 14.01 9 11.01"></polyline></svg>
                             </div>
                         </div>
-                        <button onclick="restoreUser(${user.id})" class="w-full bg-white border border-blue-200 text-blue-600 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition shadow-sm"><i data-lucide="rotate-ccw" class="w-4 h-4"></i> 利用中に戻す</button>
+                        <button onclick="restoreUser(${user.id})" class="w-full bg-white border border-blue-200 text-blue-600 py-3 rounded-2xl font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition shadow-sm"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>利用中に戻す</button>
                     </div>`}
                 <div class="flex flex-col gap-2">
-                    <button onclick="showView('list')" class="w-full bg-gray-100 text-gray-500 py-3 rounded-xl font-bold text-sm transition active:scale-95 text-xs">一覧に戻る</button>
-                    <button onclick="deleteInDetail(${user.id})" class="text-red-400 text-[10px] mt-4 font-bold flex items-center justify-center gap-1 transition active:opacity-60"><i data-lucide="trash-2" class="w-3 h-3"></i> データを完全に削除</button>
+                    <button onclick="showView('list')" class="w-full bg-gray-100 text-gray-500 py-3 rounded-xl font-bold text-sm transition active:scale-95 text-xs italic">一覧に戻る</button>
+                    <button onclick="deleteInDetail(${user.id})" class="text-red-400 text-[10px] mt-4 font-bold flex items-center justify-center gap-1 transition active:opacity-60 text-left"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>データを完全に削除</button>
                 </div>
             </div>
         `;
-        showView('detail');
-        refreshIcons();
+        showView('detail'); refreshIcons();
     };
 
     window.openHistoryDetail = (userId, historyIdx) => {
-        const user = users.find(u => u.id === userId);
-        if (!user || !user.history[historyIdx]) return;
-        const entry = user.history[historyIdx];
-        const modal = document.getElementById('history-modal');
-        const content = document.getElementById('history-detail-content');
-        let diffHtml = '';
-        if (entry.diff && entry.diff.length > 0) {
-            diffHtml = entry.diff.map(d => `
-                <div class="bg-white border rounded-xl p-3 space-y-1 shadow-sm">
-                    <p class="text-[10px] font-bold text-blue-500 uppercase">${d.label}</p>
-                    <div class="flex flex-col gap-1">
-                        <span class="diff-removed text-xs">${d.old}</span>
-                        <div class="flex items-center gap-2">
-                            <i data-lucide="corner-down-right" class="w-3 h-3 text-gray-400"></i>
-                            <span class="diff-added text-xs font-bold">${d.new}</span>
-                        </div>
-                    </div>
-                </div>`).join('');
-        } else { diffHtml = `<p class="text-center py-4 text-gray-400 text-sm italic">${entry.action}</p>`; }
-        content.innerHTML = `<div class="text-center pb-2"><p class="text-xs text-gray-400">${new Date(entry.date).toLocaleString()}</p><p class="font-bold text-gray-800">担当：${entry.staff}</p></div><div class="space-y-3"><p class="text-xs font-bold text-gray-500 border-l-4 border-blue-500 pl-2">修正箇所</p>${diffHtml}</div>`;
-        modal.classList.remove('modal-hidden');
-        refreshIcons();
+        const user = users.find(u => u.id === userId); if (!user || !user.history[historyIdx]) return;
+        const entry = user.history[historyIdx]; const modal = document.getElementById('history-modal'); const content = document.getElementById('history-detail-content');
+        let diffHtml = entry.diff && entry.diff.length > 0 ? entry.diff.map(d => `<div class="bg-white border rounded-xl p-3 space-y-1 shadow-sm"><p class="text-[10px] font-bold text-blue-500 uppercase">${d.label}</p><div class="flex flex-col gap-1"><span class="diff-removed text-xs">${d.old}</span><div class="flex items-center gap-2"><svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 10 20 15 15 20"></polyline><path d="M4 4v7a4 4 0 0 0 4 4h12"></path></svg><span class="diff-added text-xs font-bold">${d.new}</span></div></div></div>`).join('') : `<p class="text-center py-4 text-gray-400 text-sm italic">${entry.action}</p>`;
+        content.innerHTML = `<div class="text-center pb-2"><p class="text-xs text-gray-400">${new Date(entry.date).toLocaleString()}</p><p class="font-bold text-gray-800">担当：${entry.staff}</p></div><div class="space-y-3"><p class="text-xs font-bold text-gray-500 border-l-4 border-blue-500 pl-2 text-left">修正箇所</p>${diffHtml}</div>`;
+        modal.classList.remove('modal-hidden'); refreshIcons();
     };
 
     window.closeHistoryModal = () => { document.getElementById('history-modal').classList.add('modal-hidden'); };
-
-    window.deleteInDetail = (userId) => {
-        showCustomModal({ title: 'データを削除', message: 'このデータを完全に削除しますか？', icon: '<i data-lucide="trash-2" class="text-red-500 w-8 h-8"></i>', confirmText: '削除', confirmColor: 'bg-red-500', onConfirm: () => { users = users.filter(u => u.id !== userId); saveToDB(); showView('list'); } });
-    };
-
-    window.toggleCheck = (userId, lugIdx) => {
-        const user = users.find(u => u.id === userId);
-        if (user) { user.luggage[lugIdx].checked = !user.luggage[lugIdx].checked; saveToDB(); }
-    };
-
+    window.deleteInDetail = (userId) => { showCustomModal({ title: 'データを削除', message: '完全に削除しますか？', icon: '<i data-lucide="trash-2" class="text-red-500 w-8 h-8"></i>', confirmText: '削除', confirmColor: 'bg-red-500', onConfirm: () => { users = users.filter(u => u.id !== userId); saveToDB(); showView('list'); } }); };
+    window.toggleCheck = (userId, lugIdx) => { const user = users.find(u => u.id === userId); if (user) { user.luggage[lugIdx].checked = !user.luggage[lugIdx].checked; saveToDB(); } };
     window.processCheckout = async (userId) => {
-        const user = users.find(u => u.id === userId);
-        const staff = document.getElementById('checkout-staff').value.trim();
+        const user = users.find(u => u.id === userId); const staff = document.getElementById('checkout-staff').value.trim();
         if (!staff) { showCustomModal({ title: '入力不足', message: 'スタッフ名を入力してください。', icon: '<i data-lucide="user-x" class="text-orange-500 w-8 h-8"></i>', confirmText: 'OK', onConfirm: () => {} }); return; }
         const un = user.luggage.filter(l => !l.checked);
-        if (un.length > 0) { showCustomModal({ title: '未チェック', message: `${un.length}件の荷物が未チェックですが完了しますか？`, icon: '<i data-lucide="alert-triangle" class="text-orange-500 w-8 h-8"></i>', confirmText: '完了', confirmColor: 'bg-green-600', onConfirm: () => finalizeCheckout(user, staff) }); }
-        else { finalizeCheckout(user, staff); }
+        if (un.length > 0) showCustomModal({ title: '未チェック', message: `${un.length}件の荷物が未チェックですが完了しますか？`, icon: '<i data-lucide="alert-triangle" class="text-orange-500 w-8 h-8"></i>', confirmText: '完了', confirmColor: 'bg-green-600', onConfirm: () => finalizeCheckout(user, staff) });
+        else finalizeCheckout(user, staff);
     };
 
     function finalizeCheckout(user, staff) {
         user.status = 'out'; user.checkoutStaff = staff; user.checkoutDate = Date.now();
-        if (!user.history) user.history = [];
-        user.history.push({ date: Date.now(), staff, action: "退居完了", diff: [] });
+        if (!user.history) user.history = []; user.history.push({ date: Date.now(), staff, action: "退居完了", diff: [] });
         saveToDB(); showView('list');
     }
 
     window.restoreUser = async (userId) => {
-        showCustomModal({ title: '利用中に復帰', message: '利用中に戻しますか？', icon: '<i data-lucide="rotate-ccw" class="text-blue-500 w-8 h-8"></i>', confirmText: '戻す', onConfirm: () => {
+        showCustomModal({ title: '利用中に復帰', message: '利用中に戻しますか？', icon: '<svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"></polyline><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"></path></svg>', confirmText: '戻す', onConfirm: () => {
             const user = users.find(u => u.id === userId);
             if (user) { user.status = 'in'; user.checkoutDate = null; user.checkoutStaff = ''; if (!user.history) user.history = []; user.history.push({ date: Date.now(), staff: "システム", action: "利用中に復帰", diff: [] }); saveToDB(); showView('list'); }
         } });
@@ -678,6 +576,5 @@
 
     document.addEventListener('DOMContentLoaded', init);
 </script>
-
 </body>
 </html>
