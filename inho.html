@@ -55,7 +55,9 @@
     <main id="content" class="p-4 space-y-4">
         <!-- 一覧画面 -->
         <div id="view-list" class="space-y-4">
-            <div id="user-list-container" class="space-y-3"></div>
+            <div id="user-list-container" class="space-y-3">
+                <p class="text-center text-gray-400 py-10">読み込み中...</p>
+            </div>
         </div>
 
         <!-- 登録・編集フォーム -->
@@ -236,19 +238,27 @@
     }
 
     function refreshIcons() {
-        if (typeof lucide !== 'undefined') lucide.createIcons();
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
     }
 
     async function init() {
         try {
+            // LocalForageが利用可能か確認
+            if (typeof localforage === 'undefined') {
+                throw new Error("LocalForageが読み込まれていません");
+            }
             const data = await localforage.getItem(DB_KEY);
-            users = data || [];
+            users = Array.isArray(data) ? data : [];
             cleanOldData();
             renderUserList();
             initDrawingCanvas();
             refreshIcons();
         } catch (err) {
             console.error("Initialization error:", err);
+            document.getElementById('user-list-container').innerHTML = 
+                `<p class="text-center text-red-500 py-10">初期化エラーが発生しました。再読み込みしてください。</p>`;
         }
     }
 
@@ -266,8 +276,12 @@
     }
 
     async function saveToDB() {
-        await localforage.setItem(DB_KEY, users);
-        renderUserList();
+        try {
+            await localforage.setItem(DB_KEY, users);
+            renderUserList();
+        } catch (err) {
+            console.error("Save error:", err);
+        }
     }
 
     function switchTab(tab) {
@@ -302,6 +316,7 @@
     // Drawing Logic
     function initDrawingCanvas() {
         const canvas = document.getElementById('draw-canvas');
+        if (!canvas) return;
         ctx = canvas.getContext('2d');
 
         const startDraw = (e) => {
@@ -324,8 +339,8 @@
         canvas.addEventListener('mousedown', startDraw);
         canvas.addEventListener('mousemove', draw);
         canvas.addEventListener('mouseup', endDraw);
-        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e.touches[0]); });
-        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); });
+        canvas.addEventListener('touchstart', (e) => { e.preventDefault(); startDraw(e.touches[0]); }, {passive: false});
+        canvas.addEventListener('touchmove', (e) => { e.preventDefault(); draw(e.touches[0]); }, {passive: false});
         canvas.addEventListener('touchend', endDraw);
     }
 
@@ -416,15 +431,15 @@
         const container = document.getElementById('luggage-previews');
         container.innerHTML = currentLuggageFiles.map((item, idx) => `
             <div class="bg-white border rounded-xl p-2 space-y-2 relative shadow-sm">
-                <!-- 削除ボタン（右上）：赤丸に白いゴミ箱 -->
-                <button onclick="confirmRemoveLuggage(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1.5 shadow-lg z-10 transition active:scale-90 flex items-center justify-center border border-white">
-                    <i data-lucide="trash-2" class="w-4 h-4"></i>
+                <!-- 削除ボタン（右上）：赤丸に白いゴミ箱アイコン -->
+                <button onclick="confirmRemoveLuggage(${idx})" class="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-2 shadow-lg z-10 transition active:scale-90 flex items-center justify-center border-2 border-white w-8 h-8">
+                    <i data-lucide="trash-2" class="w-4 h-4 text-white"></i>
                 </button>
                 <div class="relative group">
                     <img src="${item.image}" onclick="openImagePreview('${item.image}', '${item.name}')" class="w-full h-24 object-cover rounded-lg cursor-zoom-in border border-gray-100">
                     <!-- 写真編集ボタン -->
                     <button onclick="openDrawModal(${idx})" class="absolute bottom-1 right-1 bg-blue-600 p-2 rounded-xl shadow-lg border border-white transition active:scale-90 flex items-center gap-1">
-                        <i data-lucide="pen-tool" class="w-4 h-4 text-white"></i>
+                        <i data-lucide="pen-tool" class="w-3.5 h-3.5 text-white"></i>
                         <span class="text-[8px] text-white font-bold">編集</span>
                     </button>
                 </div>
@@ -434,7 +449,6 @@
         refreshIcons();
     }
 
-    // 荷物削除の確認ダイアログ
     window.confirmRemoveLuggage = (idx) => {
         const luggageName = currentLuggageFiles[idx].name || 'この荷物';
         showCustomModal({
@@ -508,7 +522,7 @@
                     });
                 }
                 
-                // Detailed Luggage Diff
+                // Detailed Luggage Diff (Using Actual Names)
                 const oldIds = new Set(old.luggage.map(l => l.id));
                 const currentIds = new Set(currentLuggageFiles.map(l => l.id));
                 
@@ -526,7 +540,6 @@
                     detailedDiff.push({ label: "削除された荷物", old: names, new: "-" });
                 }
 
-                // Check for name changes of existing items
                 const existingItemsWithNewNames = currentLuggageFiles.filter(l => oldIds.has(l.id));
                 existingItemsWithNewNames.forEach(newItem => {
                     const oldItem = old.luggage.find(ol => ol.id === newItem.id);
@@ -661,7 +674,6 @@
                         <h2 class="text-xl font-black text-gray-800 truncate leading-tight">${user.name}</h2>
                         <p class="text-xs text-blue-500 font-bold mt-1">入居日: ${new Date(user.checkinDate).toLocaleDateString()}</p>
                     </div>
-                    <!-- 利用中の場合のみ修正ボタンを表示（詳細画面で1つに集約） -->
                     ${user.status === 'in' ? `
                     <button onclick="editUser(${user.id})" class="flex items-center gap-1 bg-blue-50 text-blue-600 px-4 py-2 rounded-xl text-xs font-bold transition active:scale-90 border border-blue-100">
                         <i data-lucide="edit-3" class="w-4 h-4"></i><span>修正</span>
@@ -729,11 +741,9 @@
     window.openHistoryDetail = (userId, historyIdx) => {
         const user = users.find(u => u.id === userId);
         if (!user || !user.history[historyIdx]) return;
-        
         const entry = user.history[historyIdx];
         const modal = document.getElementById('history-modal');
         const content = document.getElementById('history-detail-content');
-        
         let diffHtml = '';
         if (entry.diff && entry.diff.length > 0) {
             diffHtml = entry.diff.map(d => `
@@ -751,7 +761,6 @@
         } else {
             diffHtml = `<p class="text-center py-4 text-gray-400 text-sm italic">${entry.action}</p>`;
         }
-
         content.innerHTML = `
             <div class="text-center pb-2">
                 <p class="text-xs text-gray-400">${new Date(entry.date).toLocaleString()}</p>
@@ -762,14 +771,11 @@
                 ${diffHtml}
             </div>
         `;
-
         modal.classList.remove('modal-hidden');
         refreshIcons();
     };
 
-    window.closeHistoryModal = () => {
-        document.getElementById('history-modal').classList.add('modal-hidden');
-    };
+    window.closeHistoryModal = () => { document.getElementById('history-modal').classList.add('modal-hidden'); };
 
     window.deleteInDetail = (userId) => {
         showCustomModal({
@@ -798,26 +804,12 @@
         const user = users.find(u => u.id === userId);
         const staff = document.getElementById('checkout-staff').value.trim();
         if (!staff) {
-            showCustomModal({
-                title: '入力不足',
-                message: '退居確認スタッフ名を入力してください。',
-                icon: '<i data-lucide="user-x" class="text-orange-500 w-8 h-8"></i>',
-                confirmText: 'OK',
-                onConfirm: () => {}
-            });
+            showCustomModal({ title: '入力不足', message: '退居確認スタッフ名を入力してください。', icon: '<i data-lucide="user-x" class="text-orange-500 w-8 h-8"></i>', confirmText: 'OK', onConfirm: () => {} });
             return;
         }
-        
         const unchecked = user.luggage.filter(l => !l.checked);
         if (unchecked.length > 0) {
-            showCustomModal({
-                title: '未チェックの荷物',
-                message: `チェックされていない荷物が${unchecked.length}件ありますが、完了しますか？`,
-                icon: '<i data-lucide="alert-triangle" class="text-orange-500 w-8 h-8"></i>',
-                confirmText: '完了する',
-                confirmColor: 'bg-green-600',
-                onConfirm: () => finalizeCheckout(user, staff)
-            });
+            showCustomModal({ title: '未チェックの荷物', message: `チェックされていない荷物が${unchecked.length}件ありますが、完了しますか？`, icon: '<i data-lucide="alert-triangle" class="text-orange-500 w-8 h-8"></i>', confirmText: '完了する', confirmColor: 'bg-green-600', onConfirm: () => finalizeCheckout(user, staff) });
         } else {
             finalizeCheckout(user, staff);
         }
